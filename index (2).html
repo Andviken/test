@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DA40NG Checklist</title>
+  <style>
+    body { background-color: #111; color: white; font-family: Arial, sans-serif; margin: 0; }
+    .item {
+      background-color: #222;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px solid #00e6e6;
+      font-size: 16px;
+    }
+    .item:hover {
+      background-color: #333;
+    }
+    canvas {
+      display: block;
+      margin: 60px auto 10px;
+      background: #111;
+      border: 1px solid #00e6e6;
+      touch-action: none;
+    }
+    button {
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      background-color: #00ffff;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    #notepadSection { display: none; padding: 20px; }
+  </style>
+</head>
+<body>
+
+<div id="mainChecklist">
+  <div class="item">Engine Warm Up – &lt;1000 RPM</div>
+  <div class="item" onclick="showNotepad()">ATIS & Clearance notepad</div>
+  <div class="item">ATIS – RECEIVED</div>
+</div>
+
+<div id="notepadSection">
+  <button onclick="showChecklist()">← Tilbake</button>
+  <h2 style="text-align:center; color:#00e6e6;">ATIS & Clearance Notepad</h2>
+  <canvas id="noteCanvas" width="360" height="400"></canvas>
+  <button onclick="clearCanvas()">Tøm</button>
+</div>
+
+<script>
+let canvas, ctx, drawing = false;
+
+function showNotepad() {
+  document.getElementById('mainChecklist').style.display = 'none';
+  document.getElementById('notepadSection').style.display = 'block';
+  setupCanvas();
+}
+
+function showChecklist() {
+  document.getElementById('notepadSection').style.display = 'none';
+  document.getElementById('mainChecklist').style.display = 'block';
+}
+
+function setupCanvas() {
+  canvas = document.getElementById("noteCanvas");
+  ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.onmousedown = () => drawing = true;
+  canvas.onmouseup = () => drawing = false;
+  canvas.onmousemove = draw;
+  canvas.ontouchstart = (e) => {
+    drawing = true;
+    draw(e.touches[0]);
+    e.preventDefault();
+  };
+  canvas.ontouchend = () => drawing = false;
+  canvas.ontouchmove = (e) => {
+    draw(e.touches[0]);
+    e.preventDefault();
+  };
+}
+
+function draw(e) {
+  if (!drawing || !ctx) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  ctx.strokeStyle = "#00e6e6";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+}
+
+function clearCanvas() {
+  if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>
